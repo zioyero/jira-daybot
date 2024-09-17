@@ -25,6 +25,15 @@ func (c *Client) SendDaybookEntry(ctx context.Context, db *daybook.Daybook) erro
 func (c *Client) SendDaybookDMReminder(ctx context.Context, db *daybook.Daybook) error {
 	blocks := c.buildDaybookMessage(db)
 
+	reviewDaybookReminder := slackapi.NewSectionBlock(
+		slackapi.NewTextBlockObject("mrkdwn",
+			"Hey there! Daybooks will be reported soon, this is how yours will be reported. :smile:", false, false,
+		),
+		nil,
+		nil,
+	)
+	blocks = append(blocks, reviewDaybookReminder)
+
 	_, _, err := c.slack.PostMessageContext(ctx, db.User.SlackID, slackapi.MsgOptionBlocks(blocks...))
 	if err != nil {
 		return fmt.Errorf("sending slack message: %w", err)
