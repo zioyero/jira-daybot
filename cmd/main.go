@@ -22,9 +22,15 @@ var (
 	outputFlag = flag.String("output", "stdout", "Output destination")
 )
 
+const (
+	teamPublishingEngChannel = "C04DTBQRVUK"
+	engBackendChannel        = "C032E009U2C"
+	devNullChannel           = "C07KPQHT7L7"
+)
+
 var users = []*daybook.User{
-	{AtlassianID: "61843ea1892c420072fdd376", SlackHandle: "acastillejos", SlackID: "U02L4NL51B6"},
-	{AtlassianID: "630510117cfac1bfa6f9e0fb", SlackHandle: "jbennet", SlackID: "U03SQC6F7L7"},
+	{AtlassianID: "61843ea1892c420072fdd376", SlackHandle: "acastillejos", SlackID: "U02L4NL51B6", DaybookChannels: []string{devNullChannel}},
+	// {AtlassianID: "630510117cfac1bfa6f9e0fb", SlackHandle: "jacob", SlackID: "U03SQC6F7L7", DaybookChannels: []string{teamPublishingEngChannel}},
 }
 
 func main() {
@@ -50,7 +56,7 @@ func main() {
 
 	color.White("JIRA Daybook Daemon started")
 
-	color.White("Configured users: %v", users)
+	color.White("Configured users: %s", users)
 
 	for _, j := range jobs {
 		nextRun, err := j.NextRun()

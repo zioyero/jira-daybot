@@ -10,7 +10,10 @@ debug: generate
 	go build -o bin/ -gcflags "all=-N -l" ./...
 
 run-debug: debug
-	./bin/cmd -dry-run -output=slack
+	./bin/cmd -run-now -output=stdout
+
+run-now: build
+	./bin/cmd -run-now -output=slack
 
 dockerize:
 	docker build -t zioyero/jira-daybook .

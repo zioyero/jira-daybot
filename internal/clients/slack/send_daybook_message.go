@@ -3,6 +3,7 @@ package slack
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/fatih/color"
 	slackapi "github.com/zioyero/go-slack"
@@ -12,9 +13,26 @@ import (
 func (c *Client) SendDaybookEntry(ctx context.Context, db *daybook.Daybook) error {
 	blocks := c.buildDaybookMessage(db)
 
-	_, _, err := c.slack.PostMessageContext(ctx, devNullChannel, slackapi.MsgOptionBlocks(blocks...))
-	if err != nil {
-		return fmt.Errorf("sending slack message: %w", err)
+	for _, channel := range db.User.DaybookChannels {
+		headerBlock := slackapi.NewSectionBlock(
+			slackapi.NewTextBlockObject("mrkdwn",
+				fmt.Sprintf(":thread: <@%s> *Daybook for %s*", db.User.SlackHandle, db.Day.Format("2006-01-02")), false, false,
+			),
+			nil,
+			nil,
+		)
+
+		_, ts, err := c.slack.PostMessageContext(ctx, channel, slackapi.MsgOptionBlocks(headerBlock))
+		if err != nil {
+			return fmt.Errorf("sending slack message: %w", err)
+		}
+
+		_, _, err = c.slack.PostMessageContext(ctx, channel, slackapi.MsgOptionBlocks(blocks...), slackapi.MsgOptionTS(ts))
+		if err != nil {
+			return fmt.Errorf("sending slack message: %w", err)
+		}
+
+		time.Sleep(1 * time.Second) // Sleep for 1 second to avoid rate limiting
 	}
 
 	color.Green("Sent daybook entry to Slack")

@@ -15,9 +15,10 @@ type Daybook struct {
 }
 
 type User struct {
-	SlackHandle string
-	SlackID     string
-	AtlassianID string
+	SlackHandle     string
+	SlackID         string
+	AtlassianID     string
+	DaybookChannels []string
 }
 
 type Task struct {
